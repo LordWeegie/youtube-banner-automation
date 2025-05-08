@@ -1,0 +1,41 @@
+name: Update YouTube Banner
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  update-banner:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Write credentials and token files
+      env:
+        CREDENTIALS_JSON: ${{ secrets.CREDENTIALS_JSON }}
+        TOKEN_JSON: ${{ secrets.TOKEN_JSON }}
+        YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
+        DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+      run: |
+        echo "$CREDENTIALS_JSON" > credentials.json
+        echo "$TOKEN_JSON" > token.json
+        echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> $GITHUB_ENV
+        echo "YOUTUBE_CHANNEL_ID=$YOUTUBE_CHANNEL_ID" >> $GITHUB_ENV
+        echo "DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID" >> $GITHUB_ENV
+
+    - name: Run script to update banner
+      run: python generate_youtube_banner.py
