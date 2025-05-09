@@ -122,5 +122,5 @@ while True:
     except Exception as e:
         print(f"Error during execution: {e}")
     
-    print("Waiting 5 minutes before the next run...")
-    time.sleep(1)  # 5 minutes
+    print("Waiting 100 seconds before the next run...")
+    time.sleep(100)  # 100 seconds
