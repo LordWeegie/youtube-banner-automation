@@ -123,4 +123,4 @@ while True:
         print(f"Error during execution: {e}")
     
     print("Waiting 5 minutes before the next run...")
-    time.sleep(20)  # 5 minutes
+    time.sleep(5)  # 5 minutes
