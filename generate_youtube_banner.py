@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import os
 
-# API setup for YouTube Data API (use environment variables)
+# API setup for YouTube Data API (fetch subscriber count)
 API_KEY = os.getenv("YOUTUBE_API_KEY")
 CHANNEL_ID = os.getenv("YOUTUBE_CHANNEL_ID")
 
@@ -79,8 +79,11 @@ draw.text(percentage_position, percentage_text, font=small_font, fill=(255, 255,
 banner_file = "youtube_banner_with_progress.png"
 banner.save(banner_file)
 
-# Google Drive API setup
-SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+# OAuth 2.0 setup with permissions for YouTube banner uploads
+SCOPES = [
+    "https://www.googleapis.com/auth/drive.file",  # For Drive (if you kept this)
+    "https://www.googleapis.com/auth/youtube.force-ssl"  # For YouTube banner uploads
+]
 creds = None
 token_path = "token.json"
 
@@ -97,23 +100,14 @@ if not creds or not creds.valid:
     with open(token_path, "w") as token:
         token.write(creds.to_json())
 
-# Build Drive API service
-drive_service = build("drive", "v3", credentials=creds)
+# Build YouTube API service
+youtube_service = build("youtube", "v3", credentials=creds)
 
-# Upload banner to Google Drive (use environment variable for folder ID)
-folder_id = os.getenv("DRIVE_FOLDER_ID")
-if not folder_id:
-    raise ValueError("Missing required environment variable: DRIVE_FOLDER_ID")
-
-file_metadata = {
-    "name": "youtube_banner_with_progress.png",
-    "parents": [folder_id]
-}
+# Upload banner to YouTube
 media = MediaFileUpload(banner_file)
-file = drive_service.files().create(
-    body=file_metadata,
-    media_body=media,
-    fields="id"
-).execute()
+request = youtube_service.channelBanners().insert(
+    media_body=media
+)
+response = request.execute()
 
-print("Banner generated and uploaded to Google Drive:", file.get("id"))
+print("Banner uploaded to YouTube:", response)
