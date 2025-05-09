@@ -29,13 +29,19 @@ jobs:
         TOKEN_JSON: ${{ secrets.TOKEN_JSON }}
         YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         YOUTUBE_CHANNEL_ID: ${{ secrets.YOUTUBE_CHANNEL_ID }}
-        DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
       run: |
         echo "$CREDENTIALS_JSON" > credentials.json
         echo "$TOKEN_JSON" > token.json
         echo "YOUTUBE_API_KEY=$YOUTUBE_API_KEY" >> $GITHUB_ENV
         echo "YOUTUBE_CHANNEL_ID=$YOUTUBE_CHANNEL_ID" >> $GITHUB_ENV
-        echo "DRIVE_FOLDER_ID=$DRIVE_FOLDER_ID" >> $GITHUB_ENV
+
+    - name: Debug environment and files
+      run: |
+        echo "YOUTUBE_API_KEY: $YOUTUBE_API_KEY"
+        echo "YOUTUBE_CHANNEL_ID: $YOUTUBE_CHANNEL_ID"
+        ls -la
+        cat credentials.json
+        cat token.json
 
     - name: Run script to update banner
       run: python generate_youtube_banner.py
